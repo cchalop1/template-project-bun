@@ -55,6 +55,19 @@ VITE_API_URL=http://localhost:3000
 - **Linting/Formatting**: Biome (not ESLint/Prettier)
 - **TypeScript**: Strict mode via `tsconfig.base.json`
 
+## Elysia Best Practices
+
+**Controllers** — Treat each Elysia instance as a controller and define routes directly on it. Destructure only the needed properties from `Context`, never pass the entire `Context` to a function.
+
+**Services**
+- No HTTP dependency → static class or plain function
+- HTTP/request dependent → implement as an Elysia instance (preserves type inference). Name the plugin to enable deduplication.
+- Use `decorate` only for request-scoped properties (`requestIP`, `session`, etc.)
+
+**Models** — Use Elysia's validation schemas as the single source of truth for both runtime validation and TypeScript types. Avoid separate interface/class declarations alongside schemas.
+
+**Folder structure** — Feature-based: each feature owns its routes, service, and model files together.
+
 ## Adding New Packages
 
 Follow the existing pattern: create under `packages/` or `apps/`, add to root `package.json` workspaces, extend `tsconfig.base.json` in the package's own `tsconfig.json`.
