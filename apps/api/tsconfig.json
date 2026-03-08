@@ -4,6 +4,6 @@
 		"composite": true,
 		"tsBuildInfoFile": ".tsbuildinfo"
 	},
-	"include": ["src"],
+	"include": ["src", "test"],
 	"exclude": ["node_modules"]
 }
