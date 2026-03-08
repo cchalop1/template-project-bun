@@ -1,5 +1,6 @@
 import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
+import { authRoute } from "./routes/auth";
 import { formRoute } from "./routes/form";
 
 export const createApp = () =>
@@ -18,4 +19,5 @@ export const createApp = () =>
 			}),
 		)
 		.use(formRoute)
+		.use(authRoute)
 		.get("/health", () => ({ status: "ok" }));
