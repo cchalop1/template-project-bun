@@ -48,6 +48,7 @@ API (`apps/api/.env`):
 PORT=3000
 FRONTEND_URL=http://localhost:5173
 DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+JWT_SECRET=your-secret-key-change-in-production
 ```
 
 UI (`apps/ui/.env`):
@@ -55,13 +56,37 @@ UI (`apps/ui/.env`):
 VITE_API_URL=http://localhost:3000
 ```
 
+### API Routes
+
+| Route | Method | Description | Auth |
+|-------|--------|-------------|------|
+| `/health` | GET | Health check, returns `{ status: "ok" }` | None |
+| `/auth/signin` | POST | Register user, returns JWT token | None |
+| `/auth/login` | POST | Authenticate user, returns JWT token | None |
+| `/form/submit` | POST | Submit a form (name, role?, comments?) | None |
+
+Auth routes (`apps/api/src/routes/auth/`):
+- **Signin body**: `{ email, username, password }` — hashes password with `Bun.password.hash()`
+- **Login body**: `{ email, password }` — verifies with `Bun.password.verify()`, signs JWT (7-day expiry)
+- Follow Service/Repository pattern: `service.ts` (business logic) + `repository.ts` (Drizzle queries) + `model.ts` (Elysia schemas)
+
+### Database Schema
+
+`users` table (`apps/api/src/db/schema.ts`):
+- `id` — UUID primary key, auto-generated
+- `email` — varchar(255), unique
+- `username` — varchar(255), unique
+- `password` — varchar(255), hashed
+- `createdAt` — timestamp, default now()
+
 ## Tech Stack
 
 - **Runtime/Package manager**: Bun
-- **Backend**: Elysia (type-safe HTTP framework)
-- **Frontend**: React 19, Vite, TailwindCSS v4, shadcn/ui
+- **Backend**: Elysia (type-safe HTTP framework), `src/app.ts` configures CORS + routes, `src/index.ts` starts the server
+- **Frontend**: React 19, Vite, TailwindCSS v4, shadcn/ui, React Hook Form, Sonner (toasts)
+- **Auth**: `@elysiajs/jwt` (JWT signing), `Bun.password` (Argon2 hashing)
 - **Database**: PostgreSQL + Drizzle ORM (Bun SQL driver), schema in `apps/api/src/db/schema.ts`
-- **Validation**: Arktype (frontend), Elysia's built-in types (backend)
+- **Validation**: Arktype (frontend forms), Elysia's built-in types (backend)
 - **Linting/Formatting**: Biome (not ESLint/Prettier)
 - **TypeScript**: Strict mode via `tsconfig.base.json`
 
@@ -76,7 +101,7 @@ VITE_API_URL=http://localhost:3000
 
 **Models** — Use Elysia's validation schemas as the single source of truth for both runtime validation and TypeScript types. Avoid separate interface/class declarations alongside schemas.
 
-**Folder structure** — Feature-based: each feature owns its routes, service, and model files together.
+**Folder structure** — Feature-based: each feature owns its routes, service, model, and repository files together. Example: `src/routes/auth/` contains `index.ts`, `model.ts`, `service.ts`, `repository.ts`.
 
 ## Adding New Packages
 
