@@ -15,6 +15,14 @@ bun format           # Format code (Biome)
 bun clean:modules    # Remove node_modules and lockfile
 ```
 
+Database (from `apps/api`):
+```bash
+bun run db:generate  # Generate migrations from schema changes
+bun run db:migrate   # Apply migrations
+bun run db:push      # Push schema directly to DB (dev)
+bun run db:studio    # Open Drizzle Studio GUI
+```
+
 Production builds:
 ```bash
 cd apps/api && bun run build   # Compiles to native binary at dist/server
@@ -39,6 +47,7 @@ API (`apps/api/.env`):
 ```
 PORT=3000
 FRONTEND_URL=http://localhost:5173
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
 ```
 
 UI (`apps/ui/.env`):
@@ -51,6 +60,7 @@ VITE_API_URL=http://localhost:3000
 - **Runtime/Package manager**: Bun
 - **Backend**: Elysia (type-safe HTTP framework)
 - **Frontend**: React 19, Vite, TailwindCSS v4, shadcn/ui
+- **Database**: PostgreSQL + Drizzle ORM (Bun SQL driver), schema in `apps/api/src/db/schema.ts`
 - **Validation**: Arktype (frontend), Elysia's built-in types (backend)
 - **Linting/Formatting**: Biome (not ESLint/Prettier)
 - **TypeScript**: Strict mode via `tsconfig.base.json`
